@@ -54,8 +54,7 @@ class Assignment(db.Model):
     @classmethod
     def upsert(cls, assignment_new: 'Assignment'):
         if assignment_new.id is not None:
-            assignment = Assignment.get_by_id(assignment_new.id)
-            assertions.assert_found(assignment, 'No assignment with this id was found')
+            assignment = cls.get_by_id_or_404(assignment_new.id)
             assertions.assert_valid(assignment.state == AssignmentStateEnum.DRAFT,
                                     'only assignment in draft state can be edited')
 

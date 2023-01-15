@@ -77,7 +77,7 @@ def test_submit_assignment_student_1(client, h_student_1):
     assert data['teacher_id'] == 2
 
 
-def test_submit_assignment_student_1_update_error(client, h_student_1):
+def test_post_assignment_student_1_update_error(client, h_student_1):
     """failure case: only draft assignment can be edited"""
     content = 'ABCD TESTPOST new lines after submit'
     response = client.post(
@@ -95,7 +95,7 @@ def test_submit_assignment_student_1_update_error(client, h_student_1):
     assert error_response["message"] == 'only assignment in draft state can be edited'
 
 
-def test_assingment_resubmitt_error(client, h_student_1):
+def test_assignment_re_submit_error(client, h_student_1):
     response = client.post(
         '/student/assignments/submit',
         headers=h_student_1,

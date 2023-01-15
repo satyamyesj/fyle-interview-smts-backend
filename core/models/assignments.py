@@ -47,6 +47,7 @@ class Assignment(db.Model):
 
     @classmethod
     def get_by_id_or_404(cls, _id: int) -> Optional['Assignment']:
+        """Gets assignment with given id, if assignment is not present raises 404 error"""
         assignment = cls.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
         return assignment
@@ -81,6 +82,7 @@ class Assignment(db.Model):
 
     @classmethod
     def add_grade(cls, _id: int, grade: GradeEnum, principal: Principal) -> 'Assignment':
+        """Adds given grade on assignment"""
         assignment = cls.get_by_id_or_404(_id)
         assertions.assert_valid(
             assignment.state == AssignmentStateEnum.SUBMITTED,
@@ -95,11 +97,11 @@ class Assignment(db.Model):
         db.session.flush()
         return assignment
 
-
     @classmethod
     def get_assignments_by_student(cls, student_id):
         return cls.filter(cls.student_id == student_id).all()
 
     @classmethod
     def get_assignment_by_teacher(cls, teacher_id: int) -> List["Assignment"]:
+        """Retrieves assignments of given teacher_id"""
         return cls.filter(cls.teacher_id == teacher_id).all()

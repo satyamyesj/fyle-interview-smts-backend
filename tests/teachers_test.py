@@ -68,7 +68,7 @@ def test_grade_assignment_bad_grade(client, h_teacher_1):
 
 def test_grade_assignment_bad_assignment(client, h_teacher_1):
     """
-    failure case: If an assignment does not exists check and throw 404
+    failure case: If an assignment does not exist check and throw 404
     """
     response = client.post(
         '/teacher/assignments/grade',

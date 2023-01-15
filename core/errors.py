@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import Tuple
 from flask import Response
 from flask import jsonify
@@ -9,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import HTTPException
 
 
-class ErrorHandler(ABC):
+class ErrorHandler:
     """
     Base error handler, Different implementation of _get_status_code, _get_message can be provided
     in child classes to provide handling for specific exception classes
@@ -70,8 +69,8 @@ class HTTPExceptionHandler(ErrorHandler):
         return str(exception)
 
 
+DEFAULT_ERROR_HANDLER = ErrorHandler()
 ERROR_HANDLERS = {
-    Exception: ErrorHandler(),
     FyleError: FyleErrorHandler(),
     ValidationError: ValidationErrorHandler(),
     IntegrityError: IntegrityErrorHandler(),

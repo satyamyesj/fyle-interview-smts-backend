@@ -3,7 +3,6 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_enum import EnumField
 from core.models.assignments import Assignment, GradeEnum
 from core.libs.helpers import GeneralObject
-from marshmallow_enum import EnumField
 
 
 class AssignmentSchema(SQLAlchemyAutoSchema):
@@ -26,24 +25,25 @@ class AssignmentSchema(SQLAlchemyAutoSchema):
         return Assignment(**data_dict)
 
 
-class AssignmentSubmitSchema(Schema):
+class GeneralObjectSchema(Schema):
+    """Casts incoming payload to GeneralObject after performing field validations"""
+
+    @post_load
+    def initiate_class(self, data_dict, many, partial):
+        # pylint: disable=unused-argument,no-self-use
+        return GeneralObject(**data_dict)
+
+
+class AssignmentSubmitSchema(GeneralObjectSchema):
     class Meta:
         unknown = EXCLUDE
 
     id = fields.Integer(required=True, allow_none=False)
     teacher_id = fields.Integer(required=True, allow_none=False)
 
-    @post_load
-    def initiate_class(self, data_dict, many, partial):
-        # pylint: disable=unused-argument,no-self-use
-        return GeneralObject(**data_dict)
 
-
-class AssignmentGradeSchema(Schema):
+class AssignmentGradeSchema(GeneralObjectSchema):
+    """Schema for validating incoming payload for grade assignment request"""
     id = fields.Integer(required=True, allow_none=False)
     grade = EnumField(GradeEnum)
 
-    @post_load
-    def initiate_class(self, data_dict, many, partial):
-        # pylint: disable=unused-argument,no-self-use
-        return GeneralObject(**data_dict)

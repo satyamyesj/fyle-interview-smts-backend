@@ -1,13 +1,9 @@
 from flask import jsonify
-from marshmallow.exceptions import ValidationError
 from core import app
 from core.apis.assignments import student_assignments_resources
 from core.apis.assignments.teacher import teacher_assignments_resources
+from core.errors import ERROR_HANDLERS
 from core.libs import helpers
-from core.libs.exceptions import FyleError
-from werkzeug.exceptions import HTTPException
-
-from sqlalchemy.exc import IntegrityError
 
 app.register_blueprint(student_assignments_resources, url_prefix='/student')
 app.register_blueprint(teacher_assignments_resources, url_prefix='/teacher')
@@ -24,22 +20,5 @@ def ready():
 
 
 @app.errorhandler(Exception)
-def handle_error(err):
-    if isinstance(err, FyleError):
-        return jsonify(
-            error=err.__class__.__name__, message=err.message
-        ), err.status_code
-    elif isinstance(err, ValidationError):
-        return jsonify(
-            error=err.__class__.__name__, message=err.messages
-        ), 400
-    elif isinstance(err, IntegrityError):
-        return jsonify(
-            error=err.__class__.__name__, message=str(err.orig)
-        ), 400
-    elif isinstance(err, HTTPException):
-        return jsonify(
-            error=err.__class__.__name__, message=str(err)
-        ), err.code
-
-    raise err
+def handle_error(exception):
+    return ERROR_HANDLERS.get(exception.__class__, Exception).get_error_response(exception)

@@ -11,4 +11,4 @@ rm core/store.sqlite3
 flask db upgrade -d core/migrations/
 
 # run test
-pytest -v tests/ --cov
+pytest -v $TESTS_DIR --cov

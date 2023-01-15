@@ -1,5 +1,5 @@
 import enum
-from typing import List
+from typing import List, Optional
 
 from core import db
 from core.apis.decorators import Principal
@@ -46,6 +46,12 @@ class Assignment(db.Model):
         return cls.filter(cls.id == _id).first()
 
     @classmethod
+    def get_by_id_or_404(cls, _id: int) -> Optional['Assignment']:
+        assignment = cls.get_by_id(_id)
+        assertions.assert_found(assignment, 'No assignment with this id was found')
+        return assignment
+
+    @classmethod
     def upsert(cls, assignment_new: 'Assignment'):
         if assignment_new.id is not None:
             assignment = Assignment.get_by_id(assignment_new.id)
@@ -63,8 +69,7 @@ class Assignment(db.Model):
 
     @classmethod
     def submit(cls, _id, teacher_id, principal: Principal):
-        assignment = Assignment.get_by_id(_id)
-        assertions.assert_found(assignment, 'No assignment with this id was found')
+        assignment = cls.get_by_id_or_404(_id)
         assertions.assert_valid(assignment.student_id == principal.student_id, 'This assignment belongs to some other student')
         assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
         assertions.assert_valid(assignment.state != AssignmentStateEnum.SUBMITTED, 'only a draft assignment can be submitted')
@@ -74,6 +79,23 @@ class Assignment(db.Model):
         db.session.flush()
 
         return assignment
+
+    @classmethod
+    def add_grade(cls, _id: int, grade: GradeEnum, principal: Principal) -> 'Assignment':
+        assignment = cls.get_by_id_or_404(_id)
+        assertions.assert_valid(
+            assignment.teacher_id == principal.teacher_id,
+            'This assignment is submitted to some other teacher'
+        )
+        assertions.assert_valid(
+            assignment.state == AssignmentStateEnum.SUBMITTED,
+            'Only submitted assignment can be graded'
+        )
+
+        assignment.grade = grade
+        db.session.flush()
+        return assignment
+
 
     @classmethod
     def get_assignments_by_student(cls, student_id):

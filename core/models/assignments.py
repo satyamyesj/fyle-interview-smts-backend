@@ -84,12 +84,12 @@ class Assignment(db.Model):
     def add_grade(cls, _id: int, grade: GradeEnum, principal: Principal) -> 'Assignment':
         assignment = cls.get_by_id_or_404(_id)
         assertions.assert_valid(
-            assignment.teacher_id == principal.teacher_id,
-            'This assignment is submitted to some other teacher'
-        )
-        assertions.assert_valid(
             assignment.state == AssignmentStateEnum.SUBMITTED,
             'Only submitted assignment can be graded'
+        )
+        assertions.assert_valid(
+            assignment.teacher_id == principal.teacher_id,
+            'This assignment is submitted to some other teacher'
         )
 
         assignment.grade = grade

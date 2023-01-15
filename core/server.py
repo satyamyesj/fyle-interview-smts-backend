@@ -1,7 +1,7 @@
 from typing import Tuple
+from flask import jsonify
 from flask import Response
 
-from flask import jsonify
 from core import app
 from core.apis.assignments import student_assignments_resources
 from core.apis.assignments.teacher import teacher_assignments_resources
